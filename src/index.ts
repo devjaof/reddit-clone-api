@@ -1,15 +1,14 @@
-import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
-import { Post } from "./entities/Post";
-import mikroOrmConfig from "./mikro-orm.config";
+import { MikroORM } from "@mikro-orm/core"
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
+  const orm = await MikroORM.init({
+    dbName: 'reddit-clone',
+    type: 'postgresql',
+    debug: process.env.NODE_ENV !== 'production',
+  });
 
-  const post = orm.em.create(Post, {title: 'Meu primeiro post loco de bão'});
-  await orm.em.persistAndFlush(post);
+};
 
-  await orm.em.nativeInsert(Post, {title: 'Segundo post só pra vê'});
-}
+main();
 
-main().catch(err => console.log(err));
+console.log("opa bão?")
