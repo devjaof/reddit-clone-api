@@ -4,7 +4,6 @@ import { Post } from "./entities/Post";
 import mikroConfig from "./mikro-orm.config";
 
 const main = async () => {
-  console.log(mikroConfig)
   const orm = await MikroORM.init(mikroConfig);
 
   // const post = orm.em.create(Post, { title: 'my first post' });
