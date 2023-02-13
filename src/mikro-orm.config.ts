@@ -2,8 +2,9 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import { MikroORM } from "@mikro-orm/core"
 import path from "path";
+import { User } from "./entities/User";
 
-const entities = [Post];
+const entities = [Post, User];
 const dbName ='reddit-clone';
 const host = 'localhost';
 const port = 3300;
