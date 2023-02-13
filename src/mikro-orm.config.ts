@@ -5,9 +5,11 @@ import path from "path";
 
 const entities = [Post];
 const dbName ='reddit-clone';
-const type = 'postgresql' as const;
-const user = 'reddit-clone';
-const password = 'postgres';
+const host = 'localhost';
+const port = 3300;
+const type = 'postgresql';
+const user = 'root';
+const password = 'root';
 const migrationPath = path.join(__dirname, "./migrations");
 
 export default {
@@ -20,6 +22,8 @@ export default {
   type,
   user,
   password,
+  host,
+  port,
   debug: !__prod__,
   allowGlobalContext: true
 } as Parameters<typeof MikroORM.init>[0];
