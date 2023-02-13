@@ -13,6 +13,15 @@ services:
     ports:
       - "3300:5432"
 
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6600:6379'
+    volumes: 
+      - cache:/data
 volumes:
   postgres-db:
+    driver: local  
+  cache:
     driver: local
