@@ -37,12 +37,6 @@ const main = async () => {
         resave: false,
         saveUninitialized: false
     }));
-    app.use(function (req, res, next) {
-        if (!req.session) {
-            return next(new Error("oh no"));
-        }
-        next();
-    });
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
             resolvers: [user_1.UserResolver, post_1.PostResolver],
@@ -57,6 +51,7 @@ const main = async () => {
     });
 };
 main().catch(e => {
+    console.log('é aqui?????????');
     console.error(e);
 });
 //# sourceMappingURL=index.js.map

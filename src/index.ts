@@ -40,12 +40,6 @@ const main = async () => {
       saveUninitialized: false
     })
   )
-  app.use(function (req, res, next) {
-    if (!req.session) {
-      return next(new Error("oh no")) // handle error
-    }
-    next() // otherwise continue
-  })
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
@@ -64,5 +58,6 @@ const main = async () => {
 };
 
 main().catch(e => {
+  console.log('é aqui?????????')
   console.error(e);
 });
