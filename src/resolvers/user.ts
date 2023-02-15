@@ -85,7 +85,6 @@ export class UserResolver {
 
     try {
       await em.persistAndFlush(user);
-      console.log("wtf caraio");
       return { user };
     } catch (error) {
       if (error.code === "23505" || error.details.includes("already exists")) {

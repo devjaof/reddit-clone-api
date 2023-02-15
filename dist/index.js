@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
+const apollo_server_core_1 = require("apollo-server-core");
 const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
 const core_1 = require("@mikro-orm/core");
 const constants_1 = require("./constants");
@@ -20,7 +21,8 @@ const main = async () => {
     await orm.getMigrator().up();
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
-    const redisClient = (0, redis_1.createClient)();
+    const redisClient = (0, redis_1.createClient)({ legacyMode: true });
+    await redisClient.connect();
     app.use((0, express_session_1.default)({
         name: 'qid',
         store: new RedisStore({
@@ -29,6 +31,7 @@ const main = async () => {
             disableTTL: true
         }),
         cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
             sameSite: 'lax',
             secure: constants_1.__prod__
@@ -42,6 +45,9 @@ const main = async () => {
             resolvers: [user_1.UserResolver, post_1.PostResolver],
             validate: false
         }),
+        plugins: [
+            (0, apollo_server_core_1.ApolloServerPluginLandingPageGraphQLPlayground)()
+        ],
         context: ({ req, res }) => ({ em: orm.em, req, res })
     });
     await apolloServer.start();
@@ -51,7 +57,6 @@ const main = async () => {
     });
 };
 main().catch(e => {
-    console.log('é aqui?????????');
     console.error(e);
 });
 //# sourceMappingURL=index.js.map

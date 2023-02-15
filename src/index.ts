@@ -1,4 +1,6 @@
 import "reflect-metadata";
+
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import mikroConfig from "./mikro-orm.config";
 import { MikroORM } from "@mikro-orm/core"
 import { __prod__ } from "./constants";
@@ -19,7 +21,8 @@ const main = async () => {
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = createClient();
+  const redisClient = createClient({ legacyMode: true });
+  await redisClient.connect();
   
   app.use(
     session({
@@ -28,9 +31,9 @@ const main = async () => {
         client: redisClient,
         disableTouch: true,
         disableTTL: true
-
       }),
       cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: 'lax', // csrf
         secure: __prod__ // cookie only works in https
@@ -46,6 +49,9 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver],
       validate: false
     }),
+    plugins: [
+      ApolloServerPluginLandingPageGraphQLPlayground()
+    ],
     context: ({ req, res }): MyContext => ({ em: orm.em, req, res })
   })
 
@@ -58,6 +64,5 @@ const main = async () => {
 };
 
 main().catch(e => {
-  console.log('é aqui?????????')
   console.error(e);
 });
