@@ -22,23 +22,22 @@ const main = async () => {
     const app = (0, express_1.default)();
     const RedisStore = (0, connect_redis_1.default)(express_session_1.default);
     const redisClient = (0, redis_1.createClient)({ legacyMode: true });
-    await redisClient.connect();
     app.use((0, express_session_1.default)({
-        name: 'qid',
+        name: 'COOKIE_NAME',
         store: new RedisStore({
             client: redisClient,
             disableTouch: true,
-            disableTTL: true
         }),
         cookie: {
             maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             httpOnly: true,
-            sameSite: 'lax',
-            secure: constants_1.__prod__
+            sameSite: "lax",
+            secure: constants_1.__prod__,
+            domain: constants_1.__prod__ ? ".codeponder.com" : undefined,
         },
-        secret: "dsaçldsakdçsad",
+        saveUninitialized: false,
+        secret: 'process.env.SESSION_SECRET',
         resave: false,
-        saveUninitialized: false
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: await (0, type_graphql_1.buildSchema)({
@@ -52,6 +51,8 @@ const main = async () => {
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({ app });
+    await redisClient.connect();
+    redisClient.on("error", console.error);
     app.listen(4400, () => {
         console.log("Server running on localhost:4400");
     });

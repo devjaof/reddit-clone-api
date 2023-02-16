@@ -37,6 +37,17 @@ class UserResponse {
 }
 
 export class UserResolver {
+  @Query(() => User, { nullable: true }) 
+  async me(@Ctx() { req, em }: MyContext) {
+    console.log(req.session)
+    // significa que não está logado, resolver treta dos cookie
+    if(!req.session.userId) {
+      return null
+    }
+
+    return await em.findOne(User, { id: req.session.userId });
+  }
+
   @Query(() => [User])
   users(@Ctx() { em }: MyContext): Promise<User[]> {
     return em.find(User, {});
@@ -53,7 +64,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { req, em }: MyContext
   ): Promise<UserResponse> {
     if (options.username.length <= 2) {
       return {
@@ -85,6 +96,7 @@ export class UserResolver {
 
     try {
       await em.persistAndFlush(user);
+      req.session.userId = user.id;
       return { user };
     } catch (error) {
       if (error.code === "23505" || error.details.includes("already exists")) {
@@ -138,9 +150,11 @@ export class UserResolver {
         ],
       };
     }
+    console.log( req.session, user.id);
 
     req.session.userId = user.id;
-
+    
+    console.log('ta chegando aqui?',  req.session);
     return {
       user,
     };
