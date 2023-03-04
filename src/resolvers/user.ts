@@ -150,11 +150,9 @@ export class UserResolver {
         ],
       };
     }
-    console.log( req.session, user.id);
 
     req.session.userId = user.id;
-    
-    console.log('ta chegando aqui?',  req.session);
+
     return {
       user,
     };
