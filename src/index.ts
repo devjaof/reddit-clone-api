@@ -3,7 +3,7 @@ import "reflect-metadata";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import mikroConfig from "./mikro-orm.config";
 import { MikroORM } from "@mikro-orm/core"
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from "type-graphql";
 import { PostResolver } from "./resolvers/post";
@@ -32,7 +32,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: 'qid',
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,
