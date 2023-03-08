@@ -7,9 +7,9 @@ import { User } from "./entities/User";
 const entities = [Post, User];
 const dbName ='reddit-clone';
 const host = 'localhost';
-const port = 3300;
+const port = 5432;
 const type = 'postgresql';
-const user = 'root';
+const user = 'postgres';
 const password = 'root';
 const migrationPath = path.join(__dirname, "./migrations");
 
