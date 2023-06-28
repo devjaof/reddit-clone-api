@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { Post, User } from './entity';
-import { Init1687996027493 } from './migration/1687996027493-init';
+import { Init1687996574398 } from './migration/1687996574398-init';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -13,6 +13,6 @@ export const AppDataSource = new DataSource({
   synchronize: true,
   logging: false,
   entities: [User, Post],
-  migrations: [Init1687996027493],
+  migrations: [Init1687996574398],
   migrationsTableName: 'migrations',
 });
