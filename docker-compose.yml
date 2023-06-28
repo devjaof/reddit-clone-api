@@ -24,7 +24,8 @@ volumes:
     driver: local
   cache:
     driver: local
+
 # mysql -u root -p; "secret"
 # use reddit-clone;
-# grant all privileges to reddit-clone.* 'admin'@'localhost';
+# grant all privileges to reddit-clone.* 'admin'@'%';
 # flush privileges;
