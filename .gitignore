@@ -1,8 +1,9 @@
-/dist/
-/tmp/
-/node_modules/
-/yarn-error.log
-
-jsconfig.json
-
-
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+dist/
+yarn-error.log/
+yarn.lock/

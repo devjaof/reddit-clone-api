@@ -1,27 +1,30 @@
-version: '3.5'
-
+version: '3.8'
 services:
-  postgres:
-    container_name: reddit-clone
-    image: postgres:15
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      PGDATA: /data/postgres
-    volumes:
-       - postgres-db:/data/postgres
+      - MYSQL_DATABASE=reddit-clone
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=123456
     ports:
-      - "3300:5432"
-
+      - '3306:3306'
   cache:
     image: redis:6.2-alpine
     restart: always
     ports:
       - '6379:6379'
-    volumes: 
+    volumes:
+      - mysql:/var/lib/mysql
       - cache:/data
 volumes:
-  postgres-db:
-    driver: local  
+  mysql:
+    driver: local
   cache:
     driver: local
+# mysql -u root -p; "secret"
+# use reddit-clone;
+# grant all privileges to reddit-clone.* 'admin'@'localhost';
+# flush privileges;
