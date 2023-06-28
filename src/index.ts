@@ -1,77 +1,72 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import mikroConfig from "./mikro-orm.config";
-import { MikroORM } from "@mikro-orm/core"
-import { COOKIE_NAME, __prod__ } from "./constants";
 import { ApolloServer } from 'apollo-server-express';
-import { buildSchema } from "type-graphql";
-import { PostResolver } from "./resolvers/post";
-import  express from "express";
-import { UserResolver } from "./resolvers/user";
-import { createClient } from 'redis';
-import session from 'express-session';
 import connectRedis from 'connect-redis';
-import cors from "cors";
+import cors from 'cors';
+import express from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
+import { buildSchema } from 'type-graphql';
+import { COOKIE_NAME, __prod__ } from './constants';
+import { PostResolver, UserResolver } from './resolvers';
+import { MyContext } from './types';
+import { AppDataSource } from './data-source';
+
+const PORT = 4000;
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroConfig);
-  await orm.getMigrator().up();
+  const dataSource = await AppDataSource.initialize();
 
   const app = express();
 
   const RedisStore = connectRedis(session);
-  const redisClient = createClient({ legacyMode: true });
+  const redis = new Redis();
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
-      credentials: true
+      origin: 'http://localhost:3000',
+      credentials: true,
     })
-  )
+  );
 
   app.use(
     session({
       name: COOKIE_NAME,
       store: new RedisStore({
-        client: redisClient,
+        client: redis,
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        maxAge: 1000 * 60 * 60 * 24 * 265 * 10, // 10 years
+        sameSite: 'lax', // csrf
         httpOnly: true,
-        sameSite: "lax", // csrf
-        secure: __prod__, // cookie only works in https
-        domain: __prod__ ? ".codeponder.com" : undefined,
+        secure: __prod__,
       },
       saveUninitialized: false,
-      secret: 'process.env.SESSION_SECRET',
+      secret: 'secret',
       resave: false,
     })
-  )
+  );
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, PostResolver],
-      validate: false
+      resolvers: [PostResolver, UserResolver],
+      validate: false,
     }),
-    plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground()
-    ],
-    context: ({ req, res }) => ({ em: orm.em, req, res })
-  })
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    context: ({ req, res }): MyContext => ({ dataSource, req, res, redis }),
+  });
 
   await apolloServer.start();
+
   apolloServer.applyMiddleware({ app, cors: false });
 
-  await redisClient.connect();
-  redisClient.on("error", console.error);
-
-  app.listen(4400, () => {
-    console.log("Server running on localhost:4400");
-  })
+  app.listen(PORT, () => {
+    console.log(`Server started at ${PORT}`);
+  });
 };
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
 });
