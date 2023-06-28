@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ID, Int, ObjectType } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
 import { User } from './User';
 
@@ -27,6 +27,10 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
+
+  @Field(() => Int)
+  @Column({ type: 'int', default: 0 })
+  points: string;
 
   @Field()
   @CreateDateColumn()

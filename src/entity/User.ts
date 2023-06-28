@@ -19,10 +19,10 @@ export class User extends BaseEntity {
   id: string = uuid();
 
   @Field(() => String)
-  @Column({ type: 'text', nullable: false, unique: true })
+  @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ nullable: false })
   password: string;
 
   @Field(() => String)
