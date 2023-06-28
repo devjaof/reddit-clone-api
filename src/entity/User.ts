@@ -1,11 +1,12 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  PrimaryColumn,
+  Generated,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { v4 as uuid } from 'uuid';
@@ -15,7 +16,8 @@ import { Post } from './Post';
 @Entity()
 export class User extends BaseEntity {
   @Field(() => ID)
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn({ unique: true })
+  @Generated('uuid')
   id: string = uuid();
 
   @Field(() => String)

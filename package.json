@@ -13,7 +13,8 @@
     "dev-ts": "nodemon --exec ts-node ./src/index.ts",
     "start": "ts-node src/index.ts",
     "start-ts": "ts-node ./src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:run": "typeorm migration:run -d ./src/data-source.ts"
   },
   "repository": {
     "type": "git",
