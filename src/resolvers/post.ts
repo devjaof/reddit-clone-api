@@ -1,61 +1,91 @@
-import { Post } from "../entities/Post";
-import { MyContext } from "src/types";
-import { Arg, Ctx, ID, Mutation, Query } from "type-graphql";
+import { Post } from '../entity';
+import {
+  Arg,
+  Ctx,
+  FieldResolver,
+  Int,
+  Query,
+  Resolver,
+  Root,
+} from 'type-graphql';
+import { MyContext } from '../types';
+// import { isAuthenticated } from '../middlewares/isAuthenticated';
 
+// @InputType()
+// class PostInput {
+//   @Field()
+//   title: string;
+
+//   @Field()
+//   body: string;
+// }
+
+@Resolver(Post)
 export class PostResolver {
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return root.body.slice(0, 50);
+  }
+
   @Query(() => [Post])
-  posts(@Ctx() { em }: MyContext): Promise<Post[]> {
-    return em.find(Post, {});
-  }
+  async posts(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { dataSource }: MyContext
+  ): Promise<Post[]> {
+    const realLimit = Math.min(20, limit);
 
-  @Query(() => Post, { nullable: true })
-  post(
-    @Arg("id", () => ID) id: string,
-    @Ctx() { em }: MyContext
-  ): Promise<Post | null> {
-    return em.findOne(Post, { id });
-  }
+    const builder = dataSource
+      .getRepository(Post)
+      .createQueryBuilder('p')
+      .limit(realLimit)
+      .orderBy('"createdAt"', 'DESC');
 
-  @Mutation(() => Post)
-  async createPost(
-    @Arg("title", () => String) title: string,
-    @Ctx() { em }: MyContext
-  ): Promise<Post> {
-    const post = em.create(Post, { title });
-    await em.persistAndFlush(post);
-
-    return post;
-  }
-
-  @Mutation(() => Post, { nullable: true })
-  async updatePost(
-    @Arg("id", () => ID) id: string,
-    @Arg("title", () => String, { nullable: true }) title: string,
-    @Ctx() { em }: MyContext
-  ): Promise<Post | null> {
-    const post = await em.findOne(Post, { id });
-    if (!post) {
-      return null;
+    if (cursor) {
+      builder.where('"createdAt" < :cursor', { cursor: new Date(cursor) });
     }
 
-    if (typeof title !== "undefined") {
-      post.title = title;
-      await em.persistAndFlush(post);
-    }
-    return post;
+    return builder.getMany();
   }
 
-  @Mutation(() => Post)
-  async deletePost(
-    @Arg("id", () => ID) id: string,
-    @Ctx() { em }: MyContext
-  ): Promise<Boolean> {
-    // const post = await em.findOne(Post, {id});
-    // if(!post) {
-    //   return null;
-    // }
-    await em.nativeDelete(Post, { id });
-    return true;
-    // return post;
-  }
+  // @Query(() => Post, { nullable: true })
+  // post(@Arg('id', () => String) id: string): Promise<Post | null> {
+  //   return Post.findOne({ where: { id } });
+  // }
+
+  // @Mutation(() => Post)
+  // // @UseMiddleware(isAuthenticated)
+  // async createPost(
+  //   @Arg('input') input: PostInput,
+  //   @Ctx() { req }: MyContext
+  // ): Promise<Post> {
+  //   return Post.create({
+  //     ...input,
+  //     creatorId: req.session.userId,
+  //   }).save();
+  // }
+
+  // @Mutation(() => Post, { nullable: true })
+  // async updatePost(
+  //   @Arg('id') id: number,
+  //   @Arg('title', () => String, { nullable: true }) title: string
+  // ): Promise<Post | null> {
+  //   const post = await Post.findOne({ where: { id } });
+
+  //   if (!post) {
+  //     return null;
+  //   }
+
+  //   if (typeof title !== 'undefined') {
+  //     await Post.update({ id }, { title });
+  //   }
+
+  //   return post;
+  // }
+
+  // @Mutation(() => Boolean)
+  // async deletePost(@Arg('id') id: number): Promise<Boolean> {
+  //   await Post.delete(id);
+  //   return true;
+  // }
 }
