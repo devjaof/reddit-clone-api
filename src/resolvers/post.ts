@@ -13,7 +13,7 @@ import {
   UseMiddleware,
 } from 'type-graphql';
 import { MyContext } from '../types';
-import { isAuthenticated } from 'src/middleware/isAuthenticated';
+import { isAuthenticated } from '../middleware/isAuthenticated';
 
 @InputType()
 class PostInput {
