@@ -24,8 +24,8 @@ volumes:
     driver: local
   cache:
     driver: local
-
 # mysql -u root -p; "secret"
-# use reddit-clone;
-# grant all privileges to reddit-clone.* 'admin'@'%';
-# flush privileges;
+# USE reddit-clone;
+# CREATE USER 'admin'@'%' IDENTIFIED BY '123456';
+# ALTER USER 'admin'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+# FLUSH PRIVILEGES;
