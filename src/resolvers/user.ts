@@ -147,6 +147,7 @@ export class UserResolver {
       user = await User.create({
         username: options.username,
         password: await argon2.hash(options.password),
+        email: options.email,
       }).save();
     } catch (e) {
       if (e.code === '23505' || e.detail.includes('already exists')) {
