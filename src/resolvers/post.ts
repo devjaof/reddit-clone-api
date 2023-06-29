@@ -2,23 +2,27 @@ import { Post } from '../entity';
 import {
   Arg,
   Ctx,
+  Field,
   FieldResolver,
+  InputType,
   Int,
+  Mutation,
   Query,
   Resolver,
   Root,
+  UseMiddleware,
 } from 'type-graphql';
 import { MyContext } from '../types';
-// import { isAuthenticated } from '../middlewares/isAuthenticated';
+import { isAuthenticated } from 'src/middleware/isAuthenticated';
 
-// @InputType()
-// class PostInput {
-//   @Field()
-//   title: string;
+@InputType()
+class PostInput {
+  @Field()
+  title: string;
 
-//   @Field()
-//   body: string;
-// }
+  @Field()
+  body: string;
+}
 
 @Resolver(Post)
 export class PostResolver {
@@ -48,44 +52,44 @@ export class PostResolver {
     return builder.getMany();
   }
 
-  // @Query(() => Post, { nullable: true })
-  // post(@Arg('id', () => String) id: string): Promise<Post | null> {
-  //   return Post.findOne({ where: { id } });
-  // }
+  @Query(() => Post, { nullable: true })
+  post(@Arg('id', () => String) id: string): Promise<Post | null> {
+    return Post.findOne({ where: { id } });
+  }
 
-  // @Mutation(() => Post)
-  // // @UseMiddleware(isAuthenticated)
-  // async createPost(
-  //   @Arg('input') input: PostInput,
-  //   @Ctx() { req }: MyContext
-  // ): Promise<Post> {
-  //   return Post.create({
-  //     ...input,
-  //     creatorId: req.session.userId,
-  //   }).save();
-  // }
+  @Mutation(() => Post)
+  @UseMiddleware(isAuthenticated)
+  async createPost(
+    @Arg('input') input: PostInput,
+    @Ctx() { req }: MyContext
+  ): Promise<Post> {
+    return Post.create({
+      ...input,
+      userId: req.session.userId,
+    }).save();
+  }
 
-  // @Mutation(() => Post, { nullable: true })
-  // async updatePost(
-  //   @Arg('id') id: number,
-  //   @Arg('title', () => String, { nullable: true }) title: string
-  // ): Promise<Post | null> {
-  //   const post = await Post.findOne({ where: { id } });
+  @Mutation(() => Post, { nullable: true })
+  async updatePost(
+    @Arg('id') id: string,
+    @Arg('title', () => String, { nullable: true }) title: string
+  ): Promise<Post | null> {
+    const post = await Post.findOne({ where: { id } });
 
-  //   if (!post) {
-  //     return null;
-  //   }
+    if (!post) {
+      return null;
+    }
 
-  //   if (typeof title !== 'undefined') {
-  //     await Post.update({ id }, { title });
-  //   }
+    if (typeof title !== 'undefined') {
+      await Post.update({ id }, { title });
+    }
 
-  //   return post;
-  // }
+    return post;
+  }
 
-  // @Mutation(() => Boolean)
-  // async deletePost(@Arg('id') id: number): Promise<Boolean> {
-  //   await Post.delete(id);
-  //   return true;
-  // }
+  @Mutation(() => Boolean)
+  async deletePost(@Arg('id') id: number): Promise<Boolean> {
+    await Post.delete(id);
+    return true;
+  }
 }
