@@ -44,7 +44,7 @@ const main = async () => {
         secure: __prod__,
       },
       saveUninitialized: false,
-      secret: 'secret',
+      secret: 'djalksdjaslkdjaslk',
       resave: false,
     })
   );
