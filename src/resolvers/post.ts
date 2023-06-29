@@ -72,7 +72,8 @@ export class PostResolver {
   @Mutation(() => Post, { nullable: true })
   async updatePost(
     @Arg('id') id: string,
-    @Arg('title', () => String, { nullable: true }) title: string
+    @Arg('title', () => String, { nullable: true }) title: string,
+    @Arg('body', () => String, { nullable: true }) body: string
   ): Promise<Post | null> {
     const post = await Post.findOne({ where: { id } });
 
@@ -81,15 +82,21 @@ export class PostResolver {
     }
 
     if (typeof title !== 'undefined') {
-      await Post.update({ id }, { title });
+      await Post.update({ id }, { title, body });
     }
 
-    return post;
+    const updatedPost = await Post.findOne({ where: { id } });
+    return updatedPost;
   }
 
   @Mutation(() => Boolean)
-  async deletePost(@Arg('id') id: number): Promise<Boolean> {
-    await Post.delete(id);
-    return true;
+  async deletePost(@Arg('id') id: string): Promise<Boolean> {
+    const post = await Post.findOne({ where: { id } });
+
+    if (post) {
+      await Post.delete(id);
+      return true;
+    }
+    return false;
   }
 }
