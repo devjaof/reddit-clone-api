@@ -150,7 +150,7 @@ export class UserResolver {
         email: options.email,
       }).save();
     } catch (e) {
-      if (e.code === '23505' || e.detail.includes('already exists')) {
+      if (e.code === '23505' || e.detail?.includes('already exists')) {
         return {
           errors: [
             {
@@ -160,6 +160,10 @@ export class UserResolver {
           ],
         };
       }
+
+      return {
+        errors: e,
+      };
     }
 
     req.session.userId = user.id;
